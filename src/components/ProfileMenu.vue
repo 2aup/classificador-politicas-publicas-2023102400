@@ -67,7 +67,7 @@ async function logout() {
             d="M312 24C309.382 58.2038 282.205 85.3834 248 88C282.205 90.6166 309.382 117.796 312 152C314.618 117.796 341.795 90.6166 376 88C341.795 85.3834 314.618 58.2038 312 24Z"
             stroke="black" stroke-width="48" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-        <a href="#">{{ t("settings.questions") }}</a>
+        <a href="https://chatficanafacul.com.br" target="_blank">{{ t("settings.questions") }}</a>
       </li>
       <hr>
       <li @click="logout">
