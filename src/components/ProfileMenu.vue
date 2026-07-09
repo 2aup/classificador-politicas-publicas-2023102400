@@ -1,10 +1,11 @@
 <script setup>
 import { ref } from "vue";
 import { onClickOutside } from "@vueuse/core";
-import { useI18n } from 'vue-i18n'
+import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import { invalidateAuthCache } from "@/router";
 
-const { t } = useI18n()
+const { t } = useI18n();
 const router = useRouter();
 
 defineProps({
@@ -32,9 +33,9 @@ async function logout() {
       credentials: "include",
     });
   } finally {
-    localStorage.removeItem("auth");
-
-    window.location.href = "/login";
+    invalidateAuthCache();
+    localStorage.removeItem("auth_user");
+    await router.replace("/login");
   }
 }
 </script>
