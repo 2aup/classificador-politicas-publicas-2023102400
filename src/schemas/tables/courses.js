@@ -22,6 +22,33 @@ export async function getCourseEvasion(cursoId, highRiskThreshold = 0.7) {
   return body?.risco_percentual ?? null
 }
 
+export async function getCoursesEvasionBatch(cursoIds, highRiskThreshold = 0.7) {
+  const ids = [...new Set(cursoIds)].filter(id => id != null)
+  const byId = new Map()
+  if (ids.length === 0) return byId
+
+  const url = new URL(`${apiBase}/cursos/risco-evasao`)
+  url.searchParams.set('ids', ids.join(','))
+  url.searchParams.set('high_risk_threshold', String(highRiskThreshold))
+
+  const res = await fetch(url.toString(), {
+    method: 'GET',
+    credentials: 'include'
+  })
+
+  const body = await res.json().catch(() => ({}))
+
+  if (!res.ok) {
+    throw new Error(body?.detail || 'Erro ao calcular evasão dos cursos.')
+  }
+
+  for (const item of body?.items ?? []) {
+    byId.set(item.id_curso, item.risco_percentual)
+  }
+
+  return byId
+}
+
 function buildDetailRows(children = []) {
   const rows = []
 

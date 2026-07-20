@@ -21,19 +21,25 @@ const pendingUsers = computed(() => {
 const havePending = computed(() => pendingUsers.value > 0)
 
 const personasData = ref(null)
+const personasLoading = ref(false)
 
 async function loadHighRiskPersonas() {
-  const res = await fetch(`${apiBase}/students/personas/high-risk`, {
-    method: 'GET',
-    credentials: 'include',
-    headers: { Accept: 'application/json' }
-  })
+  personasLoading.value = true
+  try {
+    const res = await fetch(`${apiBase}/students/personas/high-risk`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: { Accept: 'application/json' }
+    })
 
-  const text = await res.text()
-  if (!res.ok) throw new Error(`Erro ao carregar personas: ${res.status}`)
+    const text = await res.text()
+    if (!res.ok) throw new Error(`Erro ao carregar personas: ${res.status}`)
 
-  const json = text ? JSON.parse(text) : {}
-  personasData.value = json?.data ?? null
+    const json = text ? JSON.parse(text) : {}
+    personasData.value = json?.data ?? null
+  } finally {
+    personasLoading.value = false
+  }
 }
 
 function openDocuments(user) {
@@ -69,22 +75,22 @@ async function handleUsersRefresh() {
 async function loadUsers() {
   loading.value = true
 
-  try{
+  try {
     const url = `${apiBase}/admin/pending-users`;
     const res = await fetch(url, {
       method: "GET",
       credentials: "include",
       headers: { "Accept": "application/json" },
     });
-  
+
     const text = await res.text();
     if (!res.ok) {
       throw new Error(`Falha ao carregar usuários. Status ${res.status}. Body: ${text}`);
     }
-  
+
     const data = text ? JSON.parse(text) : { items: [] }
     const items = Array.isArray(data?.items) ? data.items : []
-  
+
     rowData.value = items.map(u => ({
       ...u,
       id: u.id,
@@ -125,7 +131,11 @@ onMounted(() => {
       </p>
     </div>
 
-    <section v-if="personasData" class="personas-section">
+    <section v-if="personasLoading" class="personas-section personas-loading">
+      <p>Carregando Personas...</p>
+    </section>
+
+    <section v-else-if="personasData" class="personas-section">
       <div class="personas-header">
         <h2>Perfis com maior risco de evasão</h2>
         <p>
@@ -153,7 +163,7 @@ onMounted(() => {
     </section>
     <div class="pending-users-wrapper">
       <h2>Usuários Pendentes</h2>
-      <BaseTable entity="users" :rowData="rowData" @open-documents="openDocuments" :loading="loading"/>
+      <BaseTable entity="users" :rowData="rowData" @open-documents="openDocuments" :loading="loading" />
     </div>
   </section>
   <UserDocumentsModal v-if="showModal" :user="selectedUser" @close="closeModal" @refresh="handleUsersRefresh" />
