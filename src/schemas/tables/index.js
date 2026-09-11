@@ -5,6 +5,7 @@ import subjects from './subjects'
 import users from './users'
 import studentDetailCourse from './studentDetailCourse'
 import studentDetailSubject from './studentDetailSubject'
+import coursesPrincipal from './coursesPrincipal'
 
 export {
   courses,
@@ -13,5 +14,6 @@ export {
   subjects,
   users,
   studentDetailCourse,
-  studentDetailSubject
+  studentDetailSubject,
+  coursesPrincipal
 }
